@@ -1,5 +1,5 @@
 # dayspan-vuetify-example
- ssh -i ~/Documents/key/kisi_key root@167.99.208.66
+ ssh -i ~/.ssh/kisi_key root@167.99.208.66
 ls
 ## Project setup
 ```
