@@ -68,7 +68,7 @@
 
   </li>
   <template v-if='result'>
-  <li class="timeline-event">
+  <li class="timeline-event" v-if='result.passport_data.stateFacts'>
     <label class="timeline-event-icon"></label>
     <div class="timeline-event-copy">
       
@@ -86,10 +86,23 @@
       <p class="timeline-event-thumbnail">{{doc.type}}</p>
       <h3>{{doc.name}}</h3>
       <h4>{{doc.date_added}}</h4>
-      <v-btn  :href='doc.link' x-small>скачать</v-btn>
+      <v-btn target='_blank' :href='doc.link' >скачать</v-btn>
       <!-- <p><strong>Systemarchitektur, Consulting</strong><br>Konzeption und Modellierung von Systemen und APIs für Digital Publishing und Entitlement nach SOA</p> -->
     </div>
   </li>
+
+  <li class="timeline-event" v-if='result.fssp_data'>
+    <label class="timeline-event-icon"></label>
+    <div class="timeline-event-copy">
+      
+      <h3>ФССП</h3>
+      <h4>{{result.passport_data.firstName}} {{result.passport_data.lastName}} </h4>
+      <p class="timeline-event-thumbnail">JSON</p>
+      <json-viewer :value="result.fssp_data"></json-viewer>
+      <!-- <template v-for='(pasp,pasp_v) in result.passport_data'>{{pasp_v}}:{{pasp}} <br></template> -->
+    </div>
+  </li>
+
   </template>
 </ul>  
 </template>
