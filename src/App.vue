@@ -55,7 +55,8 @@
             x-small
           > {{counter}}</v-progress-circular>
           Ваша постоянная ссылка:
-          <a href="" >http://t1.4rd.info/?client_id={{data.client_id}}&login={{data.login}}&password={{data.password}}</a>
+          <a :href="link()"> http://t1.4rd.info/?client_id={{data.client_id}}&login={{data.login}}&password={{data.password}} </a>
+          
           как только система получит документы, они появятся ниже.
         </template>
         
@@ -66,24 +67,30 @@
 
 
   </li>
-  <!-- <li class="timeline-event">
-    <label class="timeline-event-icon"></label>
-    <div class="timeline-event-copy">
-      <p class="timeline-event-thumbnail">November 2009 - März 2011</p>
-      <h3>Freelancer</h3>
-      <h4>Designer und Autor</h4>
-      <p>Konzeption, Design und Produktion von Digitalen Magazinen mit InDesign, der Adobe Digital Publishing Suite und HTML5. Co-Autorin der Fachbücher "Digitales Publizieren für Tablets" und "Adobe Digital Publishing Suite" erschienen im dpunkt.verlag.</p>
-    </div>
-  </li>
+  <template v-if='result'>
   <li class="timeline-event">
     <label class="timeline-event-icon"></label>
     <div class="timeline-event-copy">
-      <p class="timeline-event-thumbnail">April 2011 - heute</p>
-      <h3>konplan gmbh</h3>
-      <h4>IT-Consultant</h4>
-      <p><strong>Systemarchitektur, Consulting</strong><br>Konzeption und Modellierung von Systemen und APIs für Digital Publishing und Entitlement nach SOA</p>
+      
+      <h3>Паспортные данные</h3>
+      <h4>{{result.passport_data.firstName}} {{result.passport_data.lastName}} </h4>
+      <p class="timeline-event-thumbnail">JSON</p>
+      <json-viewer :value="result.passport_data"></json-viewer>
+      <!-- <template v-for='(pasp,pasp_v) in result.passport_data'>{{pasp_v}}:{{pasp}} <br></template> -->
     </div>
-  </li> -->
+  </li>
+
+  <li class="timeline-event" v-for='doc in result.documents'>
+    <label class="timeline-event-icon"></label>
+    <div class="timeline-event-copy">
+      <p class="timeline-event-thumbnail">{{doc.type}}</p>
+      <h3>{{doc.name}}</h3>
+      <h4>{{doc.date_added}}</h4>
+      <v-btn  :href='doc.link' x-small>скачать</v-btn>
+      <!-- <p><strong>Systemarchitektur, Consulting</strong><br>Konzeption und Modellierung von Systemen und APIs für Digital Publishing und Entitlement nach SOA</p> -->
+    </div>
+  </li>
+  </template>
 </ul>  
 </template>
 
@@ -99,6 +106,7 @@ export default {
     extended: false,
     loading: false,
     counter: 0,
+    result: null,
     data:{
       client_id: null,
       login:"",
@@ -138,21 +146,21 @@ export default {
 
   methods:
   {
+    serialize(obj) {
+      var str = [];
+      for (var p in obj)
+        if (obj.hasOwnProperty(p)) {
+          str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+        }
+      return str.join("&");
+    },
+
     countDown(){
       this.counter+=1
-      axios.post('https://bankrot-10.kazna.tech/api/clients/',{client: this.data},
-      {
-        headers: {'api-key':'28f0d21f-74c1-47e6-a3eb-2c1a20b30cd9','Access-Control-Allow-Origin':'*'}
+      axios.get('https://bankrot-10.kazna.tech/api/clients/?'+this.serialize(this.data))
+      .then((result) => {
+        this.result = result.data
       })
-      .then(function (response) {
-        // handle success
-        console.log(response);
-      })
-      .catch(function (error) {
-        // handle error
-        console.log(error);
-      })
-
     },
     has_key(key) {
       const uri = window.location.href.split('?');
@@ -169,6 +177,9 @@ export default {
       }
       return result;
     },
+    link(){
+      return `http://t1.4rd.info/?client_id=${this.data.client_id}&login=${this.data.login}&password=${this.data.password}`
+    },
     get_random(){
       var min = 10000
       var max = 12000
@@ -180,8 +191,8 @@ export default {
       this.extended = !this.extended
     },
     start_parsing(){
-      this.data.client_id = 1;
-      setInterval(() => this.countDown(), 3000);
+      this.data.client_id = this.get_random();
+      this.countDown()
     }
     
   }

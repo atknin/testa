@@ -12,6 +12,7 @@
     "babel-loader": "^7.1.5",
     "dayspan-vuetify": "0.2.3",
     "vue": "2.5.16",
+    "vue-json-viewer": "^2.2.19",
     "vuetify": "1.1.9"
   },
   "devDependencies": {
