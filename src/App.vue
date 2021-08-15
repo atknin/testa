@@ -55,7 +55,7 @@
             x-small
           > {{counter}}</v-progress-circular>
           Ваша постоянная ссылка:
-          <a href="" >http://t1.4rd.info/?client_id={{data.client_id}}</a>
+          <a href="" >http://t1.4rd.info/?client_id={{data.client_id}}&login={{data.login}}&password={{data.password}}</a>
           как только система получит документы, они появятся ниже.
         </template>
         
@@ -89,7 +89,7 @@
 
 <script>
 import Vue from 'vue';
-
+const axios = require('axios');
 
 export default {
 
@@ -116,9 +116,14 @@ export default {
    
   },  
   created(){
-    var client_id = this.has_clien_id();
+    var client_id = this.has_key('client_id');
+    var login = this.has_key('login');
+    var password = this.has_key('password');
+
     if (client_id){
       this.data.client_id = client_id;
+      this.data.login = login;
+      this.data.password = password;
       this.loading = true;
       setInterval(() => this.countDown(), 3000);
     }
@@ -135,9 +140,21 @@ export default {
   {
     countDown(){
       this.counter+=1
+      axios.post('https://bankrot-10.kazna.tech/api/clients/',{client: this.data},
+      {
+        headers: {'api-key':'28f0d21f-74c1-47e6-a3eb-2c1a20b30cd9','Access-Control-Allow-Origin':'*'}
+      })
+      .then(function (response) {
+        // handle success
+        console.log(response);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      })
 
     },
-    has_clien_id() {
+    has_key(key) {
       const uri = window.location.href.split('?');
       let result = null;
       if (uri.length === 2) {
@@ -146,7 +163,7 @@ export default {
         vars.forEach((v) => {
           tmp = v.split('=');
           if (tmp.length === 2) {
-            if (tmp[0] === 'client_id') result = tmp[1];
+            if (tmp[0] === key) result = tmp[1];
           }
         });
       }
